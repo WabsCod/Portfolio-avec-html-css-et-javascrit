@@ -13,3 +13,5 @@ git commit -m "first commit"
 git branch -M main
 git remote add origin git@github.com:WabsCod/Portfolio-avec-html-css-et-javascrit.git
 git push -u origin main
+
+C:\Users\Client\AppData\Local\Packages\38833FF26BA1D.UnigramPreview_g9c9v27vpyspw\LocalState\0\videos
