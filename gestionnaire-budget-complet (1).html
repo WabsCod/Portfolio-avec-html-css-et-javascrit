@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionnaire de Budget Personnel - Cours JavaScript Complet</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #009699 0%, #00d4d8 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            color: #009699;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 3px solid #009699;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #009699;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #009699 0%, #00d4d8 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 150, 153, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-box h3 {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .stat-box .amount {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .stat-box.revenue .amount {
+            color: #28a745;
+        }
+
+        .stat-box.expense .amount {
+            color: #dc3545;
+        }
+
+        .stat-box.balance .amount {
+            color: #009699;
+        }
+
+        .transaction-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .transaction-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .transaction-item:hover {
+            transform: translateX(5px);
+        }
+
+        .transaction-info {
+            flex: 1;
+        }
+
+        .transaction-description {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .transaction-category {
+            font-size: 0.85em;
+            color: #666;
+            background: #e9ecef;
+            padding: 3px 10px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+
+        .transaction-amount {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 0 15px;
+        }
+
+        .transaction-amount.revenue {
+            color: #28a745;
+        }
+
+        .transaction-amount.expense {
+            color: #dc3545;
+        }
+
+        .transaction-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 0.85em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-edit {
+            background: #ffc107;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-small:hover {
+            opacity: 0.8;
+            transform: scale(1.05);
+        }
+
+        .chart-container {
+            grid-column: 1 / -1;
+        }
+
+        .chart {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .filters select {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state svg {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 Gestionnaire de Budget Personnel</h1>
+            <p>Projet JavaScript Complet - Cours Pratique avec Explications</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Formulaire d'ajout de transaction -->
+            <div class="card">
+                <h2>Ajouter une Transaction</h2>
+                <form id="transactionForm">
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <input type="text" id="description" placeholder="Ex: Salaire, Loyer, Courses..." required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="amount">Montant (FCFA)</label>
+                        <input type="number" id="amount" placeholder="0" required step="0.01">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="type">Type</label>
+                        <select id="type" required>
+                            <option value="">-- Choisir --</option>
+                            <option value="revenue">Revenu</option>
+                            <option value="expense">Dépense</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Catégorie</label>
+                        <select id="category" required>
+                            <option value="">-- Choisir --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="date">Date</label>
+                        <input type="date" id="date" required>
+                    </div>
+
+                    <button type="submit" class="btn" id="submitBtn">Ajouter la Transaction</button>
+                </form>
+            </div>
+
+            <!-- Statistiques -->
+            <div class="card">
+                <h2>Statistiques</h2>
+                <div class="stats">
+                    <div class="stat-box revenue">
+                        <h3>Total Revenus</h3>
+                        <div class="amount" id="totalRevenue">0 FCFA</div>
+                    </div>
+                    <div class="stat-box expense">
+                        <h3>Total Dépenses</h3>
+                        <div class="amount" id="totalExpense">0 FCFA</div>
+                    </div>
+                    <div class="stat-box balance">
+                        <h3>Solde</h3>
+                        <div class="amount" id="balance">0 FCFA</div>
+                    </div>
+                </div>
+
+                <div class="filters">
+                    <select id="filterType">
+                        <option value="all">Tous les types</option>
+                        <option value="revenue">Revenus uniquement</option>
+                        <option value="expense">Dépenses uniquement</option>
+                    </select>
+
+                    <select id="filterCategory">
+                        <option value="all">Toutes catégories</option>
+                    </select>
+
+                    <select id="sortBy">
+                        <option value="date-desc">Date (récent)</option>
+                        <option value="date-asc">Date (ancien)</option>
+                        <option value="amount-desc">Montant (élevé)</option>
+                        <option value="amount-asc">Montant (faible)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Liste des transactions -->
+            <div class="card chart-container">
+                <h2>Historique des Transactions</h2>
+                <div id="transactionList" class="transaction-list">
+                    <!-- Les transactions seront ajoutées ici dynamiquement -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // PARTIE 1 : VARIABLES ET TYPES DE DONNÉES
+        // ============================================
+        
+        /*
+         * En JavaScript, on peut déclarer des variables de 3 façons :
+         * - var : ancienne méthode (portée fonction, peut être redéclarée)
+         * - let : moderne (portée bloc, peut être réassignée)
+         * - const : moderne (portée bloc, ne peut PAS être réassignée)
+         * 
+         * Bonne pratique : Toujours utiliser const par défaut, let seulement si besoin de réassigner
+         */
+
+        // Tableau pour stocker toutes les transactions
+        // Array (tableau) : structure de données qui stocke plusieurs valeurs
+        let transactions = [];
+
+        // Variable pour stocker l'ID de la transaction en cours d'édition
+        let editingTransactionId = null;
+
+        // Constantes pour les catégories
+        // Object (objet) : structure de données avec paires clé-valeur
+        const CATEGORIES = {
+            revenue: ['Salaire', 'Freelance', 'Investissement', 'Cadeau', 'Autre'],
+            expense: ['Loyer', 'Alimentation', 'Transport', 'Santé', 'Loisirs', 'Éducation', 'Autre']
+        };
+
+        // ============================================
+        // PARTIE 2 : DOM (Document Object Model)
+        // ============================================
+        
+        /*
+         * Le DOM est la représentation de la page HTML en JavaScript
+         * document.getElementById() : récupère un élément par son ID
+         * document.querySelector() : récupère le premier élément correspondant au sélecteur CSS
+         * document.querySelectorAll() : récupère tous les éléments correspondants
+         */
+
+        // Récupération des éléments du formulaire
+        const transactionForm = document.getElementById('transactionForm');
+        const descriptionInput = document.getElementById('description');
+        const amountInput = document.getElementById('amount');
+        const typeSelect = document.getElementById('type');
+        const categorySelect = document.getElementById('category');
+        const dateInput = document.getElementById('date');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Récupération des éléments de statistiques
+        const totalRevenueElement = document.getElementById('totalRevenue');
+        const totalExpenseElement = document.getElementById('totalExpense');
+        const balanceElement = document.getElementById('balance');
+
+        // Récupération des éléments de filtrage
+        const filterTypeSelect = document.getElementById('filterType');
+        const filterCategorySelect = document.getElementById('filterCategory');
+        const sortBySelect = document.getElementById('sortBy');
+
+        // Récupération de la liste des transactions
+        const transactionList = document.getElementById('transactionList');
+
+        // ============================================
+        // PARTIE 3 : FONCTIONS
+        // ============================================
+        
+        /*
+         * Les fonctions sont des blocs de code réutilisables
+         * 
+         * 3 façons de déclarer une fonction :
+         * 1. Function declaration : function maFonction() {}
+         * 2. Function expression : const maFonction = function() {}
+         * 3. Arrow function (ES6) : const maFonction = () => {}
+         * 
+         * Arrow functions : syntaxe plus courte, pas de 'this' propre
+         */
+
+        // Fonction pour initialiser la date d'aujourd'hui
+        function initializeDate() {
+            // Date : objet JavaScript pour manipuler les dates
+            const today = new Date();
+            // toISOString() : convertit la date en chaîne ISO (YYYY-MM-DD)
+            // split('T')[0] : prend uniquement la partie date
+            dateInput.value = today.toISOString().split('T')[0];
+        }
+
+        // Fonction pour peupler le select des catégories selon le type
+        // Paramètre : 'type' peut être 'revenue' ou 'expense'
+        function populateCategorySelect(type) {
+            // Vider le select
+            categorySelect.innerHTML = '<option value="">-- Choisir --</option>';
+            
+            // Condition ternaire : condition ? valeurSiVrai : valeurSiFaux
+            const categories = type ? CATEGORIES[type] : [];
+            
+            // forEach : méthode de tableau qui exécute une fonction pour chaque élément
+            categories.forEach(category => {
+                // Template literals (backticks) : permet d'insérer des variables avec ${}
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categorySelect.appendChild(option);
+            });
+        }
+
+        // Fonction pour peupler le filtre de catégories
+        function populateCategoryFilter() {
+            // Spread operator (...) : décompose un tableau/objet
+            // Set : structure de données qui ne garde que des valeurs uniques
+            const allCategories = [...CATEGORIES.revenue, ...CATEGORIES.expense];
+            const uniqueCategories = [...new Set(allCategories)];
+            
+            filterCategorySelect.innerHTML = '<option value="all">Toutes catégories</option>';
+            
+            uniqueCategories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                filterCategorySelect.appendChild(option);
+            });
+        }
+
+        // ============================================
+        // PARTIE 4 : CLASSES ET POO (Programmation Orientée Objet)
+        // ============================================
+        
+        /*
+         * Une classe est un plan (blueprint) pour créer des objets
+         * Elle contient :
+         * - constructor : méthode appelée lors de la création d'un objet
+         * - propriétés : données de l'objet (this.propriete)
+         * - méthodes : fonctions de l'objet
+         */
+
+        class Transaction {
+            // Le constructor initialise les propriétés de l'objet
+            constructor(description, amount, type, category, date) {
+                // this : fait référence à l'objet actuel
+                this.id = Date.now(); // Génère un ID unique basé sur le timestamp
+                this.description = description;
+                // parseFloat : convertit une chaîne en nombre décimal
+                this.amount = parseFloat(amount);
+                this.type = type; // 'revenue' ou 'expense'
+                this.category = category;
+                this.date = date;
+                this.createdAt = new Date(); // Date de création
+            }
+
+            // Méthode pour formater le montant
+            getFormattedAmount() {
+                // toLocaleString : formate un nombre selon une locale
+                return this.amount.toLocaleString('fr-FR', {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+
+            // Méthode pour obtenir l'icône selon la catégorie
+            getCategoryIcon() {
+                // Object literal : objet pour faire du mapping
+                const icons = {
+                    'Salaire': '💼',
+                    'Freelance': '💻',
+                    'Investissement': '📈',
+                    'Cadeau': '🎁',
+                    'Loyer': '🏠',
+                    'Alimentation': '🍔',
+                    'Transport': '🚗',
+                    'Santé': '🏥',
+                    'Loisirs': '🎮',
+                    'Éducation': '📚',
+                    'Autre': '📝'
+                };
+                // Opérateur || : retourne la première valeur truthy
+                return icons[this.category] || '📝';
+            }
+
+            // Méthode pour obtenir l'élément HTML de la transaction
+            toHTML() {
+                // Template literals avec expressions
+                return `
+                    <div class="transaction-item" data-id="${this.id}">
+                        <div class="transaction-info">
+                            <div class="transaction-description">
+                                ${this.getCategoryIcon()} ${this.description}
+                            </div>
+                            <span class="transaction-category">${this.category}</span>
+                            <small style="color: #999; margin-left: 10px;">${this.formatDate()}</small>
+                        </div>
+                        <div class="transaction-amount ${this.type}">
+                            ${this.type === 'revenue' ? '+' : '-'}${this.getFormattedAmount()} FCFA
+                        </div>
+                        <div class="transaction-actions">
+                            <button class="btn-small btn-edit" onclick="editTransaction(${this.id})">
+                                ✏️ Modifier
+                            </button>
+                            <button class="btn-small btn-delete" onclick="deleteTransaction(${this.id})">
+                                🗑️ Supprimer
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Méthode pour formater la date
+            formatDate() {
+                const date = new Date(this.date);
+                const options = { day: 'numeric', month: 'long', year: 'numeric' };
+                return date.toLocaleDateString('fr-FR', options);
+            }
+        }
+
+        // ============================================
+        // PARTIE 5 : LOCAL STORAGE (Stockage Local)
+        // ============================================
+        
+        /*
+         * LocalStorage : API du navigateur pour stocker des données localement
+         * - Stockage persistant (reste après fermeture du navigateur)
+         * - Stocke uniquement des chaînes de caractères
+         * - JSON.stringify() : convertit objet JS en chaîne JSON
+         * - JSON.parse() : convertit chaîne JSON en objet JS
+         */
+
+        // Sauvegarder les transactions dans LocalStorage
+        function saveToLocalStorage() {
+            // JSON.stringify convertit le tableau d'objets en chaîne JSON
+            localStorage.setItem('budgetTransactions', JSON.stringify(transactions));
+        }
+
+        // Charger les transactions depuis LocalStorage
+        function loadFromLocalStorage() {
+            // localStorage.getItem retourne null si la clé n'existe pas
+            const stored = localStorage.getItem('budgetTransactions');
+            
+            if (stored) {
+                // JSON.parse convertit la chaîne JSON en tableau d'objets
+                const parsedData = JSON.parse(stored);
+                
+                // map() : crée un nouveau tableau en transformant chaque élément
+                // On recrée des instances de Transaction (pour avoir les méthodes)
+                transactions = parsedData.map(t => {
+                    const transaction = new Transaction(
+                        t.description,
+                        t.amount,
+                        t.type,
+                        t.category,
+                        t.date
+                    );
+                    transaction.id = t.id; // Garder l'ID original
+                    transaction.createdAt = new Date(t.createdAt);
+                    return transaction;
+                });
+            }
+        }
+
+        // ============================================
+        // PARTIE 6 : MANIPULATION DU DOM ET EVENTS
+        // ============================================
+        
+        /*
+         * Events (événements) : actions qui se produisent dans le navigateur
+         * - click, submit, change, input, keypress, etc.
+         * 
+         * addEventListener : attache un gestionnaire d'événement à un élément
+         * - 1er paramètre : type d'événement
+         * - 2ème paramètre : fonction à exécuter (callback)
+         */
+
+        // Event listener pour le changement de type
+        typeSelect.addEventListener('change', (e) => {
+            // e.target : l'élément qui a déclenché l'événement
+            populateCategorySelect(e.target.value);
+        });
+
+        // Event listener pour la soumission du formulaire
+        transactionForm.addEventListener('submit', (e) => {
+            // preventDefault() : empêche le comportement par défaut (rechargement de page)
+            e.preventDefault();
+            
+            // Validation des champs
+            // trim() : supprime les espaces au début et à la fin
+            if (!descriptionInput.value.trim()) {
+                alert('Veuillez entrer une description');
+                return; // return : sort de la fonction
+            }
+
+            if (amountInput.value <= 0) {
+                alert('Le montant doit être supérieur à 0');
+                return;
+            }
+
+            if (!typeSelect.value) {
+                alert('Veuillez choisir un type');
+                return;
+            }
+
+            if (!categorySelect.value) {
+                alert('Veuillez choisir une catégorie');
+                return;
+            }
+
+            // Si on est en mode édition
+            if (editingTransactionId !== null) {
+                updateTransaction();
+            } else {
+                addTransaction();
+            }
+        });
+
+        // ============================================
+        // PARTIE 7 : FONCTIONS CRUD (Create, Read, Update, Delete)
+        // ============================================
+
+        // CREATE : Ajouter une transaction
+        function addTransaction() {
+            // Créer une nouvelle instance de Transaction
+            // 'new' : mot-clé pour créer un objet à partir d'une classe
+            const transaction = new Transaction(
+                descriptionInput.value.trim(),
+                amountInput.value,
+                typeSelect.value,
+                categorySelect.value,
+                dateInput.value
+            );
+
+            // push() : ajoute un élément à la fin d'un tableau
+            transactions.push(transaction);
+            
+            // Sauvegarder dans LocalStorage
+            saveToLocalStorage();
+            
+            // Réinitialiser le formulaire
+            resetForm();
+            
+            // Mettre à jour l'affichage
+            updateUI();
+            
+            // Notification visuelle
+            showNotification('Transaction ajoutée avec succès!', 'success');
+        }
+
+        // READ : Afficher les transactions
+        function displayTransactions() {
+            // Appliquer les filtres et le tri
+            let filteredTransactions = filterTransactions();
+            filteredTransactions = sortTransactions(filteredTransactions);
+
+            // Si aucune transaction
+            if (filteredTransactions.length === 0) {
+                transactionList.innerHTML = `
+                    <div class="empty-state">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        <p>Aucune transaction à afficher</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // map() retourne un nouveau tableau
+            // join('') : concatène tous les éléments du tableau en une chaîne
+            transactionList.innerHTML = filteredTransactions
+                .map(transaction => transaction.toHTML())
+                .join('');
+        }
+
+        // UPDATE : Modifier une transaction
+        function editTransaction(id) {
+            // find() : retourne le premier élément qui satisfait la condition
+            // Arrow function courte : (param) => expression
+            const transaction = transactions.find(t => t.id === id);
+            
+            if (!transaction) return;
+
+            // Remplir le formulaire avec les données existantes
+            descriptionInput.value = transaction.description;
+            amountInput.value = transaction.amount;
+            typeSelect.value = transaction.type;
+            
+            // Peupler les catégories puis sélectionner la bonne
+            populateCategorySelect(transaction.type);
+            categorySelect.value = transaction.category;
+            dateInput.value = transaction.date;
+
+            // Passer en mode édition
+            editingTransactionId = id;
+            submitBtn.textContent = 'Mettre à Jour';
+            submitBtn.style.background = 'linear-gradient(135deg, #ffc107 0%, #ff9800 100%)';
+
+            // Scroll vers le formulaire
+            transactionForm.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function updateTransaction() {
+            // findIndex() : retourne l'index du premier élément qui satisfait la condition
+            const index = transactions.findIndex(t => t.id === editingTransactionId);
+            
+            if (index === -1) return;
+
+            // Mettre à jour la transaction
+            transactions[index].description = descriptionInput.value.trim();
+            transactions[index].amount = parseFloat(amountInput.value);
+            transactions[index].type = typeSelect.value;
+            transactions[index].category = categorySelect.value;
+            transactions[index].date = dateInput.value;
+
+            // Sauvegarder
+            saveToLocalStorage();
+            
+            // Réinitialiser
+            resetForm();
+            updateUI();
+            
+            showNotification('Transaction modifiée avec succès!', 'success');
+        }
+
+        // DELETE : Supprimer une transaction
+        function deleteTransaction(id) {
+            // Confirmer la suppression
+            // confirm() : affiche une boîte de dialogue avec OK/Annuler
+            if (!confirm('Êtes-vous sûr de vouloir supprimer cette transaction ?')) {
+                return;
+            }
+
+            // filter() : crée un nouveau tableau avec les éléments qui passent le test
+            // !== : strictement différent (vérifie type ET valeur)
+            transactions = transactions.filter(t => t.id !== id);
+            
+            saveToLocalStorage();
+            updateUI();
+            
+            showNotification('Transaction supprimée', 'error');
+        }
+
+        // ============================================
+        // PARTIE 8 : FONCTIONS DE CALCUL
+        // ============================================
+        
+        /*
+         * reduce() : méthode très puissante qui "réduit" un tableau à une seule valeur
+         * - Prend une fonction callback avec accumulator et currentValue
+         * - Accumulator : valeur accumulée (résultat partiel)
+         * - CurrentValue : élément actuel du tableau
+         * - Valeur initiale : 0 dans notre cas
+         */
+
+        function calculateStatistics() {
+            // Calculer le total des revenus
+            // filter() + reduce() : pattern très courant en JS
+            const totalRevenue = transactions
+                .filter(t => t.type === 'revenue')
+                .reduce((sum, t) => sum + t.amount, 0);
+
+            // Calculer le total des dépenses
+            const totalExpense = transactions
+                .filter(t => t.type === 'expense')
+                .reduce((sum, t) => sum + t.amount, 0);
+
+            // Calculer le solde
+            const balance = totalRevenue - totalExpense;
+
+            // Retourner un objet avec les résultats
+            // Shorthand property : si clé === valeur, on peut écrire juste 'totalRevenue'
+            return {
+                totalRevenue,
+                totalExpense,
+                balance
+            };
+        }
+
+        function updateStatistics() {
+            const stats = calculateStatistics();
+
+            // Formater et afficher
+            totalRevenueElement.textContent = `${stats.totalRevenue.toLocaleString('fr-FR')} FCFA`;
+            totalExpenseElement.textContent = `${stats.totalExpense.toLocaleString('fr-FR')} FCFA`;
+            
+            // Couleur conditionnelle pour le solde
+            balanceElement.textContent = `${stats.balance.toLocaleString('fr-FR')} FCFA`;
+            balanceElement.style.color = stats.balance >= 0 ? '#009699' : '#dc3545';
+        }
+
+        // ============================================
+        // PARTIE 9 : FILTRAGE ET TRI
+        // ============================================
+        
+        /*
+         * Higher-order functions : fonctions qui prennent ou retournent d'autres fonctions
+         * - filter(), map(), reduce(), sort() sont des higher-order functions
+         */
+
+        function filterTransactions() {
+            const typeFilter = filterTypeSelect.value;
+            const categoryFilter = filterCategorySelect.value;
+
+            // Chaîner plusieurs filter()
+            return transactions.filter(t => {
+                // Vérifier le type
+                const matchesType = typeFilter === 'all' || t.type === typeFilter;
+                
+                // Vérifier la catégorie
+                const matchesCategory = categoryFilter === 'all' || t.category === categoryFilter;
+                
+                // Opérateur && (AND) : les deux conditions doivent être vraies
+                return matchesType && matchesCategory;
+            });
+        }
+
+        function sortTransactions(transactionsArray) {
+            const sortOption = sortBySelect.value;
+            
+            // Copier le tableau pour ne pas modifier l'original
+            // Spread operator [...] : crée une copie superficielle
+            const sorted = [...transactionsArray];
+
+            // sort() : trie le tableau en place
+            // Compare function : (a, b) => retourne <0 si a avant b, >0 si b avant a, 0 si égaux
+            sorted.sort((a, b) => {
+                // Switch : alternative à plusieurs if/else
+                switch(sortOption) {
+                    case 'date-desc':
+                        // Trier par date décroissante (plus récent en premier)
+                        return new Date(b.date) - new Date(a.date);
+                    case 'date-asc':
+                        return new Date(a.date) - new Date(b.date);
+                    case 'amount-desc':
+                        return b.amount - a.amount;
+                    case 'amount-asc':
+                        return a.amount - b.amount;
+                    default:
+                        return 0;
+                }
+            });
+
+            return sorted;
+        }
+
+        // Event listeners pour les filtres
+        filterTypeSelect.addEventListener('change', displayTransactions);
+        filterCategorySelect.addEventListener('change', displayTransactions);
+        sortBySelect.addEventListener('change', displayTransactions);
+
+        // ============================================
+        // PARTIE 10 : FONCTIONS UTILITAIRES
+        // ============================================
+
+        function resetForm() {
+            transactionForm.reset();
+            initializeDate();
+            editingTransactionId = null;
+            submitBtn.textContent = 'Ajouter la Transaction';
+            submitBtn.style.background = 'linear-gradient(135deg, #009699 0%, #00d4d8 100%)';
+            categorySelect.innerHTML = '<option value="">-- Choisir --</option>';
+        }
+
+        function updateUI() {
+            displayTransactions();
+            updateStatistics();
+        }
+
+        // ============================================
+        // PARTIE 11 : ANIMATIONS ET NOTIFICATIONS
+        // ============================================
+        
+        /*
+         * setTimeout : exécute une fonction après un délai (en millisecondes)
+         * setInterval : exécute une fonction à intervalles réguliers
+         * clearTimeout / clearInterval : annule un timeout/interval
+         */
+
+        function showNotification(message, type = 'success') {
+            // Créer un élément de notification
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            
+            // Style inline (éviter en production, préférer les classes CSS)
+            Object.assign(notification.style, {
+                position: 'fixed',
+                top: '20px',
+                right: '20px',
+                padding: '15px 25px',
+                borderRadius: '8px',
+                color: 'white',
+                background: type === 'success' ? '#28a745' : '#dc3545',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                zIndex: '9999',
+                animation: 'slideIn 0.3s ease-out',
+                fontWeight: '600'
+            });
+
+            document.body.appendChild(notification);
+
+            // Supprimer après 3 secondes
+            setTimeout(() => {
+                // Animation de sortie
+                notification.style.animation = 'slideOut 0.3s ease-in';
+                
+                // Supprimer du DOM après l'animation
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // ============================================
+        // PARTIE 12 : GESTION DES ERREURS
+        // ============================================
+        
+        /*
+         * try...catch : gestion des erreurs
+         * - try : code qui peut générer une erreur
+         * - catch : code exécuté si une erreur se produit
+         * - finally : code exécuté dans tous les cas (optionnel)
+         */
+
+        function safeLoadFromStorage() {
+            try {
+                loadFromLocalStorage();
+            } catch (error) {
+                // console.error : affiche l'erreur dans la console du navigateur
+                console.error('Erreur lors du chargement des données:', error);
+                
+                // Réinitialiser les données en cas d'erreur
+                transactions = [];
+                localStorage.removeItem('budgetTransactions');
+                
+                showNotification('Erreur lors du chargement des données. Réinitialisation...', 'error');
+            }
+        }
+
+        // ============================================
+        // PARTIE 13 : FONCTIONS AVANCÉES
+        // ============================================
+
+        // Fonction pour exporter les données en CSV
+        function exportToCSV() {
+            if (transactions.length === 0) {
+                alert('Aucune transaction à exporter');
+                return;
+            }
+
+            // Créer l'en-tête CSV
+            const headers = ['Date', 'Description', 'Catégorie', 'Type', 'Montant'];
+            
+            // Créer les lignes de données
+            // map() pour transformer chaque transaction en ligne CSV
+            const rows = transactions.map(t => [
+                t.date,
+                t.description,
+                t.category,
+                t.type === 'revenue' ? 'Revenu' : 'Dépense',
+                t.amount
+            ]);
+
+            // Combiner headers et rows
+            const csvContent = [
+                headers.join(','),
+                ...rows.map(row => row.join(','))
+            ].join('\n');
+
+            // Créer un Blob (Binary Large Object)
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            
+            // Créer un lien de téléchargement
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', `budget_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showNotification('Export CSV réussi!', 'success');
+        }
+
+        // Fonction pour calculer les statistiques par catégorie
+        function getStatsByCategory() {
+            // reduce() pour créer un objet avec stats par catégorie
+            return transactions.reduce((acc, transaction) => {
+                const category = transaction.category;
+                
+                // Si la catégorie n'existe pas encore dans l'accumulateur
+                if (!acc[category]) {
+                    acc[category] = {
+                        total: 0,
+                        count: 0,
+                        type: transaction.type
+                    };
+                }
+
+                acc[category].total += transaction.amount;
+                acc[category].count++;
+
+                return acc;
+            }, {}); // Objet vide comme valeur initiale
+        }
+
+        // ============================================
+        // PARTIE 14 : ASYNCHRONE (BONUS)
+        // ============================================
+        
+        /*
+         * JavaScript est asynchrone : il peut exécuter plusieurs choses "en même temps"
+         * - Promises : objet représentant l'achèvement (ou l'échec) d'une opération async
+         * - async/await : syntaxe plus lisible pour travailler avec les Promises
+         */
+
+        // Fonction simulant une sauvegarde asynchrone (dans une vraie app, ce serait vers un serveur)
+        async function asyncSaveToServer() {
+            try {
+                // Simuler un délai réseau
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Simuler la sauvegarde
+                const success = Math.random() > 0.1; // 90% de chance de succès
+                
+                if (!success) {
+                    // throw : lance une erreur
+                    throw new Error('Erreur de connexion au serveur');
+                }
+
+                return { success: true, message: 'Données sauvegardées sur le serveur' };
+            } catch (error) {
+                return { success: false, message: error.message };
+            }
+        }
+
+        // ============================================
+        // PARTIE 15 : ÉVÉNEMENTS CLAVIER (BONUS)
+        // ============================================
+        
+        /*
+         * Événements clavier : keydown, keyup, keypress
+         * - e.key : la touche pressée
+         * - e.ctrlKey, e.shiftKey, e.altKey : touches modificatrices
+         */
+
+        // Raccourcis clavier
+        document.addEventListener('keydown', (e) => {
+            // Ctrl + S : Sauvegarder (exporter CSV)
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                exportToCSV();
+            }
+
+            // Escape : Annuler l'édition
+            if (e.key === 'Escape' && editingTransactionId !== null) {
+                resetForm();
+                showNotification('Édition annulée', 'error');
+            }
+        });
+
+        // ============================================
+        // PARTIE 16 : INITIALISATION DE L'APPLICATION
+        // ============================================
+        
+        /*
+         * DOMContentLoaded : événement déclenché quand le HTML est complètement chargé
+         * C'est ici qu'on initialise tout
+         */
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Charger les données sauvegardées
+            safeLoadFromStorage();
+            
+            // Initialiser la date
+            initializeDate();
+            
+            // Peupler le filtre de catégories
+            populateCategoryFilter();
+            
+            // Afficher les transactions
+            updateUI();
+
+            // Message de bienvenue
+            console.log('%c💰 Gestionnaire de Budget Personnel', 'color: #009699; font-size: 20px; font-weight: bold');
+            console.log('%cProjet JavaScript Complet - Toutes les notions essentielles', 'color: #666; font-size: 12px');
+            console.log('%cRaccourcis : Ctrl+S pour exporter en CSV', 'color: #999; font-size: 11px');
+        });
+
+        // ============================================
+        // CONCEPTS JAVASCRIPT AVANCÉS UTILISÉS
+        // ============================================
+        
+        /*
+         * ✅ Variables : var, let, const
+         * ✅ Types de données : String, Number, Boolean, Array, Object, Date
+         * ✅ Opérateurs : arithmétiques, logiques, comparaison, ternaire
+         * ✅ Conditions : if/else, switch
+         * ✅ Boucles : forEach (implicite dans map, filter, reduce)
+         * ✅ Fonctions : declaration, expression, arrow functions
+         * ✅ Fonctions fléchées (Arrow functions)
+         * ✅ Template literals
+         * ✅ Destructuring (non utilisé mais important à connaître)
+         * ✅ Spread operator (...)
+         * ✅ Classes et POO
+         * ✅ this keyword
+         * ✅ DOM Manipulation
+         * ✅ Events et Event Listeners
+         * ✅ LocalStorage
+         * ✅ JSON (stringify, parse)
+         * ✅ Array methods : push, filter, map, reduce, find, findIndex, sort
+         * ✅ String methods : trim, split, toLocaleString
+         * ✅ Higher-order functions
+         * ✅ Callbacks
+         * ✅ Try/Catch (gestion d'erreurs)
+         * ✅ setTimeout / setInterval
+         * ✅ Async/Await (bonus)
+         * ✅ Promises (bonus)
+         * ✅ ES6+ features
+         */
+
+        // ============================================
+        // EXERCICES POUR ALLER PLUS LOIN
+        // ============================================
+        
+        /*
+         * 1. Ajouter une fonctionnalité de recherche par description
+         * 2. Créer un graphique avec Chart.js pour visualiser les dépenses par catégorie
+         * 3. Ajouter la possibilité de définir un budget mensuel et afficher des alertes
+         * 4. Implémenter un système de tags multiples par transaction
+         * 5. Ajouter l'import de fichiers CSV
+         * 6. Créer des rapports mensuels/annuels
+         * 7. Ajouter une fonctionnalité de récurrence (transactions répétitives)
+         * 8. Implémenter le dark mode
+         * 9. Ajouter des animations plus élaborées avec CSS animations ou libraries
+         * 10. Connecter à une vraie API backend (Node.js + Express + MongoDB)
+         */
+
+        // Ajouter le CSS pour les animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+    </script>
+</body>
+</html>
